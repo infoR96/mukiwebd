@@ -107,7 +107,7 @@ export const eventStartLoading = () => {
             
             const resp = await fetchConToken( 'events' );
             const body = await resp.json();
-            console.log(body);
+            console.log('aqui la chucha, ',body);
 
             const events = prepareEvents( body.eventos );
             dispatch( eventLoaded( events ) );
@@ -115,10 +115,8 @@ export const eventStartLoading = () => {
         } catch (error) {
             console.log(error)
         }
-
     }
 }
-
 const eventLoaded = (events) => ({ 
     type: types.eventLoaded,
     payload: events
