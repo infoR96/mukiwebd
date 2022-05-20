@@ -6,7 +6,7 @@ import moment from 'moment';
 
 import { messages } from '../../helpers/calendar-messages-es';
 import { CalendarEvent } from './CalendarEvent';
-import { CalendarModal } from './CalendarModal';
+import { CargaModal } from './CargaModal';
 
 import { uiOpenModal } from '../../actions/ui';
 
@@ -23,25 +23,25 @@ const localizer = momentLocalizer(moment);
 export const CalendarScreen = () => {
 
     const dispatch = useDispatch();
-    const { events, activeEvent } = useSelector( state => state.calendar );
-    const { uid } = useSelector( state => state.auth );
+    const { events, activeEvent } = useSelector(state => state.calendar);
+    const { uid } = useSelector(state => state.auth);
 
-    const [lastView, setLastView] = useState( localStorage.getItem('lastView') || 'month' );
+    const [lastView, setLastView] = useState(localStorage.getItem('lastView') || 'month');
 
     useEffect(() => {
-        
-        dispatch( eventStartLoading() );
 
-    }, [ dispatch ])
+        dispatch(eventStartLoading());
+
+    }, [dispatch])
 
 
     const onDoubleClick = (e) => {
         // console.log(e);
-        dispatch( uiOpenModal() );
+        dispatch(uiOpenModal());
     }
 
     const onSelectEvent = (e) => {
-        dispatch( eventSetActive( e ) );
+        dispatch(eventSetActive(e));
     }
 
     const onViewChange = (e) => {
@@ -51,60 +51,48 @@ export const CalendarScreen = () => {
 
     const onSelectSlot = (e) => {
         // console.log(e)
-        dispatch( eventClearActiveEvent() );
+        dispatch(eventClearActiveEvent());
     }
 
 
-    const eventStyleGetter = ( event, start, end, isSelected ) => {
-    
+    const eventStyleGetter = (event, start, end, isSelected) => {
+
         const style = {
-            backgroundColor: ( uid === event.user._id ) ? '#367CF7' : '#465660',
+            backgroundColor: (uid === event.user._id) ? '#367CF7' : '#465660',
             borderRadius: '0px',
             opacity: 0.8,
             display: 'block',
             color: 'white'
         }
-        return {style}
+        return { style }
 
     };
 
     return (
         <div className="calendar-screen">
-
-        
-
             <Calendar
-                localizer={ localizer }
-                events={ events }
+                localizer={localizer}
+                events={events}
                 startAccessor="start"
                 endAccessor="end"
-                messages={ messages }
-                eventPropGetter={ eventStyleGetter }
-                onDoubleClickEvent={ onDoubleClick }
-                onSelectEvent={ onSelectEvent }
-                onView={ onViewChange }
-                onSelectSlot={ onSelectSlot }
-                selectable={ true }
-                view={ lastView }
+                messages={messages}
+                eventPropGetter={eventStyleGetter}
+                onDoubleClickEvent={onDoubleClick}
+                onSelectEvent={onSelectEvent}
+                onView={onViewChange}
+                onSelectSlot={onSelectSlot}
+                selectable={true}
+                view={lastView}
                 components={{
                     event: CalendarEvent
                 }}
             />
 
-
-
             <AddNewFab />
-
-
             {
                 (activeEvent) && <DeleteEventFab />
             }
-            
-
-            <CalendarModal />
-
-
-
+            <CargaModal />
         </div>
     )
 }

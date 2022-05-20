@@ -30,13 +30,8 @@ export const eventStartAddNew = ( event ) => {
         } catch (error) {
             console.log(error);
         }
-
-        
-
     }
 }
-
-
 
 const eventAddNew = (event) => ({
     type: types.eventAddNew,
@@ -124,7 +119,7 @@ export const eventStartLoading = () => {
     }
 }
 
-const eventLoaded = (events) => ({
+const eventLoaded = (events) => ({ 
     type: types.eventLoaded,
     payload: events
 })
