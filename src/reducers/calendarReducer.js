@@ -13,7 +13,7 @@ import { types } from '../types/types';
 
 const initialState = {
     events: [],
-    activeEvent: null
+    activeEvent: true
 };
 
 

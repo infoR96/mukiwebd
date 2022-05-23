@@ -57,12 +57,12 @@ export const eventStartUpdate = ( event ) => {
             if ( body.ok ) {
                 dispatch( eventUpdated( event ) );
             } else {
-                Swal.fire('Error', body.msg, 'error');
+                Swal.fire('Error la actualizacion', body.msg, 'error');
             }
 
 
         } catch (error) {
-            console.log(error)
+            console.log('por esto no actualiza:'.error)
         }
 
     }
@@ -96,7 +96,7 @@ export const eventStartDelete = () => {
     }
 }
 
-//TODO INVESTIGAR  ESTA ACTION 
+//INVESTIGAR  ESTA ACTION 
 const eventDeleted = () => ({ type: types.eventDeleted });
 
 
@@ -109,11 +109,11 @@ export const eventStartLoading = () => {
             const body = await resp.json();
             console.log('aqui la chucha, ',body);
 
-            const events = prepareEvents( body.eventos );
+            const events = prepareEvents( body.cargas );
             dispatch( eventLoaded( events ) );
 
         } catch (error) {
-            console.log(error)
+            console.log('eroor al mostrar cargas',error)
         }
     }
 }

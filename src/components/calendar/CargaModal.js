@@ -8,6 +8,7 @@ import Swal from 'sweetalert2';
 
 import { uiCloseModal } from '../../actions/ui';
 import { eventClearActiveEvent, eventStartAddNew, eventStartUpdate } from '../../actions/events';
+import { prepareEvents } from '../../helpers/prepareEvents';
 
 const customStyles = {
     content: {
@@ -16,22 +17,25 @@ const customStyles = {
         right: 'auto',
         bottom: 'auto',
         marginRight: '-50%',
-        transform: 'translate(-50%, -50%)'
+        transform: 'translate(-50%, -50%)',
+        overflowY: 'scroll'
     }
 };
 Modal.setAppElement('#root');
 
-const now = moment().minutes(0).seconds(0).add(1, 'hours'); // 3:00:00
-const nowPlus1 = now.clone().add(1, 'hours');
+const now = moment().minutes(0).seconds(0).add(1, 'hours'); // 8:00:00
+const nowPlus1 = now.clone().add(4, 'days');
 
 
 const initCarga = {
     ruc: '',
     nombre: '',
-    contacto: '',
-    tonelaje: '',
-    ticket: '',
+    celular: '',
     acopiador: '',
+    ticket: '',
+    pesoBruto: 0,
+    tara: 0,
+    tonelaje: 0,
     mineral: '',
     start: now.toDate(),
     end: nowPlus1.toDate()
@@ -67,26 +71,31 @@ const empresas = [
 export const CargaModal = () => {
 
     const { modalOpen } = useSelector(state => state.ui);
-    const { activeEvent }= useSelector(state => state.calendar);
+    const { activeEvent } = useSelector(state => state.calendar);
     const dispatch = useDispatch();
     const [dateStart, setDateStart] = useState(now.toDate());
-    const [ dateEnd, setDateEnd ] = useState( nowPlus1.toDate() );
-    const [titleValid, setTitleValid] = useState(true);   
+    const [dateEnd, setDateEnd] = useState(nowPlus1.toDate());
     const [formValues, setFormValues] = useState(initCarga);
-    const { ruc, nombre, contacto, tonelaje, ticket, acopiador, mineral,start,end } = initCarga;
-    const [data, setData] = useState(initCarga);
+    const { ruc, nombre, celular, acopiador, ticket, pesoBruto, tara, tonelaje, mineral, start, end } = formValues;
+    const [data, setData] = useState(empresas);
 
     useEffect(() => {
         if (activeEvent) {
             setFormValues(activeEvent);
         } else {
             setFormValues(initCarga);
+            console.log('aqui initcarga', initCarga)
         }
     }, [activeEvent, setFormValues])
 
- 
+    function addDaysToDate(date, days){
+        var res = new Date(date);
+        res.setDate(res.getDate() + days);
+        return res;
+    }
 
     const handleInputChange = ({ target }) => {
+
         setFormValues({
             ...formValues,
             [target.name]: target.value
@@ -102,20 +111,16 @@ export const CargaModal = () => {
     }
 
     const handleStartDateChange = (e) => {
+        let a = addDaysToDate(e,2)
         setDateStart(e);
         setFormValues({
             ...formValues,
-            start: e
+            start: e,
+            end:a
         })
     }
 
-    const handleEndDateChange = (e) => {
-        setDateEnd(e);
-        setFormValues({
-            ...formValues,
-            end: e
-        })
-    }
+
 
     const handleSubmitForm = (e) => {
         e.preventDefault();
@@ -128,24 +133,13 @@ export const CargaModal = () => {
             return Swal.fire('Error', 'La fecha fin debe de ser mayor a la fecha de inicio', 'error');
         }
 
-        if (nombre.trim().length < 2) {
-            return setTitleValid(false);
-        }
-
         if (activeEvent) {
             dispatch(eventStartUpdate(formValues))
         } else {
             dispatch(eventStartAddNew(formValues));
         }
-
-
-        setTitleValid(true);
         closeModal();
-
     }
-
-
-    
 
     const select = ({ target }) => {
         const seleccion = empresas.filter(empresa => empresa.id === target.value)
@@ -159,11 +153,7 @@ export const CargaModal = () => {
             nombre: razon,
             contacto: cel
         });
-    } 
-        
-
-
-
+    }
 
     return (
         <Modal
@@ -175,12 +165,13 @@ export const CargaModal = () => {
             overlayClassName="modal-fondo"
         >
 
-            <div className='d-flex flex-row  bg-primary p-4 my-3 ml-4 formingreso '>
-                <di className='Container '>
+            <div className='d-flex flex-row  bg-primary p-4 my-3 ml-4 formingreso scroll'>
+                <div className='Container'>
                     <div>
                         <div className='row container-fluid '>
                             <form onSubmit={handleSubmitForm}>
                                 <div className='Form-group col-12'>
+                                    <h1>Ingreso de Carga</h1>
                                     <input
                                         type='text'
                                         className='form-control p-3 my-2 inputs'
@@ -199,10 +190,10 @@ export const CargaModal = () => {
                                     />
                                     <input
                                         type='text'
-                                        className='form-control p-3  my-2 inputs'
-                                        placeholder='NUMERO DE CONTACTO'
-                                        value={contacto}
-                                        name='contacto'
+                                        className='form-control p-3 my-2 inputs'
+                                        placeholder='CELULAR'
+                                        value={celular}
+                                        name="celular"
                                         onChange={handleInputChange}
                                     />
                                     <div className="dropdown mx-5 offset-2 col-10">
@@ -216,6 +207,27 @@ export const CargaModal = () => {
                                             <button className="dropdown-item" value='4' onClick={select}>CONSORCIO HUERTA MINING EIRL</button>
                                         </div>
                                     </div>
+                                    <h5>Peso Bruto:</h5>
+                                    <input
+                                        type='number'
+                                        step={0.10}
+                                        className='form-control p-3 my-2 inputs'
+                                        placeholder='Peso Bruto'
+                                        value={pesoBruto}
+                                        name='pesoBruto'
+                                        onChange={handleInputChange}
+                                    />
+                                    <h5>Tara:</h5>
+                                    <input
+                                        type='number'
+                                        step={0.10}
+                                        className='form-control p-3 my-2 inputs'
+                                        placeholder='Tara'
+                                        value={tara}
+                                        name='tara'
+                                        onChange={handleInputChange}
+                                    />
+                                    <h5>Tonelaje:</h5>
                                     <input
                                         type='number'
                                         step={0.10}
@@ -230,7 +242,7 @@ export const CargaModal = () => {
                                         className='form-control p-3 my-2 inputs'
                                         placeholder='NUMERO DE TICKET'
                                         value={ticket}
-                                        name='ticket'
+                                        name="ticket"
                                         onChange={handleInputChange}
                                     />
                                     <input
@@ -249,19 +261,18 @@ export const CargaModal = () => {
                                         name='mineral'
                                         onChange={handleInputChange}
                                     />
+
                                     <div className="form-group">
                                         <label>Fecha y hora inicio</label>
-                                        {/* <DateTimePicker
-                        
-                        value={ dateStart }
-                        minDate={ dateStart }
-                        className="form-control"
-                    /> */}
+                                        <DateTimePicker
+                                            onChange={handleStartDateChange}
+                                            value={dateStart}
+                                            className="form-control"
+                                        />
                                     </div>
 
-
-                                    <h4>Ingreso:</h4>
-                                    <button className='btn btn-success py-3 mt-3'>
+                                    <button className='btn btn-success py-3 mt-3'
+                                        onClick={handleSubmitForm}>
                                         <i className="far fa-save"></i>
 
                                         <span>CARGA INGRESADA</span>
@@ -271,8 +282,7 @@ export const CargaModal = () => {
                             </form>
                         </div>
                     </div>
-
-                </di>
+                </div>
             </div>
         </Modal>
     )
